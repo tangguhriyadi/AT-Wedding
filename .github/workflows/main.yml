@@ -46,5 +46,11 @@ jobs:
             whoami
             docker stop ${{ vars.CONTAINER_NAME }} || true && docker container rm ${{vars.CONTAINER_NAME}} || true && docker image rm -f tangguhriyadi/${{ vars.IMAGE_NAME }} || true
             docker pull tangguhriyadi/${{  vars.IMAGE_NAME  }}:latest
-            docker run -d -p 3000:3000 --network paperclip_default --name ${{ vars.CONTAINER_NAME }} tangguhriyadi/${{ vars.IMAGE_NAME }}:latest
+            docker run -d -p 3000:3000 --network paperclip_default --name ${{ vars.CONTAINER_NAME }} \
+              -e DATABASE_HOST=${{ secrets.DATABASE_HOST }} \
+              -e DATABASE_PORT=${{ secrets.DATABASE_PORT }} \
+              -e DATABASE_USERNAME=${{ secrets.DATABASE_USERNAME }} \
+              -e DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e DATABASE_NAME=${{ secrets.DATABASE_NAME }} \
+              tangguhriyadi/${{ vars.IMAGE_NAME }}:latest
           '
