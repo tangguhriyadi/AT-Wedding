@@ -2,6 +2,7 @@ import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { findBySlug } from '@/lib/storage'
 import { getTemplateById, ElegantTemplate } from '@/components/templates'
+import InvitationCover from '@/components/InvitationCover'
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -54,19 +55,27 @@ export default async function WeddingPage({ params }: Props) {
 
   return (
     <main className="w-full min-h-screen">
-      <TemplateComponent
+      <InvitationCover
         brideName={invitation.brideName}
         groomName={invitation.groomName}
         weddingDate={invitation.weddingDate}
-        weddingTime={invitation.weddingTime}
-        venue={invitation.venue}
-        venueAddress={invitation.venueAddress}
-        akadVenue={invitation.akadVenue}
-        akadTime={invitation.akadTime}
-        googleMapsUrl={invitation.googleMapsUrl}
-        photos={invitation.photos}
-        message={invitation.message}
-      />
+        templateId={invitation.templateId}
+        coverPhoto={invitation.photos?.[0]}
+      >
+        <TemplateComponent
+          brideName={invitation.brideName}
+          groomName={invitation.groomName}
+          weddingDate={invitation.weddingDate}
+          weddingTime={invitation.weddingTime}
+          venue={invitation.venue}
+          venueAddress={invitation.venueAddress}
+          akadVenue={invitation.akadVenue}
+          akadTime={invitation.akadTime}
+          googleMapsUrl={invitation.googleMapsUrl}
+          photos={invitation.photos}
+          message={invitation.message}
+        />
+      </InvitationCover>
     </main>
   )
 }

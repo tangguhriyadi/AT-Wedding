@@ -1,11 +1,7 @@
 import Link from 'next/link'
 import { TEMPLATES } from '@/components/templates'
+import TemplatePhonePreview from '@/components/TemplatePhonePreview'
 
-const templatePreviews: Record<string, { bg: string; accent: string; icon: string }> = {
-  elegant: { bg: 'linear-gradient(135deg, #F9F5EE 0%, #EFE8D8 100%)', accent: '#C4973C', icon: '❦' },
-  modern:  { bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',  accent: '#e94560', icon: '◆' },
-  rustic:  { bg: 'linear-gradient(135deg, #f5ebe0 0%, #ddb892 100%)',  accent: '#7a5c3a', icon: '✿' },
-}
 
 const steps = [
   {
@@ -239,64 +235,37 @@ export default function HomePage() {
             }}
           >
             {TEMPLATES.map((tpl) => {
-              const preview = templatePreviews[tpl.id] ?? templatePreviews.elegant
               return (
                 <div
                   key={tpl.id}
                   style={{
-                    borderRadius: '4px',
-                    overflow: 'hidden',
+                    borderRadius: '8px',
                     background: '#fff',
                     boxShadow: '0 2px 24px rgba(42, 33, 24, 0.08)',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
-                  {/* Preview thumbnail */}
+                  {/* Phone mockup area */}
                   <div
                     style={{
-                      height: '200px',
-                      background: preview.bg,
+                      background: 'var(--parchment)',
+                      padding: '2rem 2rem 1.75rem',
                       display: 'flex',
-                      alignItems: 'center',
                       justifyContent: 'center',
-                      position: 'relative',
+                      alignItems: 'center',
+                      borderRadius: '8px 8px 0 0',
                     }}
                   >
-                    <span
-                      style={{
-                        fontSize: '4rem',
-                        color: preview.accent,
-                        opacity: 0.6,
-                      }}
-                    >
-                      {preview.icon}
-                    </span>
-                    <div
-                      style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                        padding: '1.25rem',
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: 'var(--font-cormorant)',
-                          fontSize: '1.1rem',
-                          fontStyle: 'italic',
-                          color: preview.accent,
-                          opacity: 0.8,
-                        }}
-                      >
-                        Nama & Nama
-                      </span>
-                    </div>
+                    <TemplatePhonePreview
+                      templateId={tpl.id}
+                      name={tpl.name}
+                      description={tpl.description}
+                    />
                   </div>
 
                   {/* Card body */}
-                  <div style={{ padding: '1.5rem' }}>
+                  <div style={{ padding: '1.25rem 1.5rem 1.5rem', borderRadius: '0 0 8px 8px' }}>
                     <h3
                       style={{
                         fontFamily: 'var(--font-cormorant)',
@@ -323,8 +292,8 @@ export default function HomePage() {
                       href="/create"
                       style={{
                         display: 'inline-block',
-                        border: `1px solid ${preview.accent}`,
-                        color: preview.accent,
+                        border: '1px solid var(--gold)',
+                        color: 'var(--gold)',
                         padding: '0.5rem 1.25rem',
                         borderRadius: '2px',
                         fontFamily: 'var(--font-geist-sans)',

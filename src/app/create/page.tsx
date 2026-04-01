@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { TEMPLATES } from '@/components/templates'
 import type { TemplateProps } from '@/types/invitation'
+import InvitationCover from '@/components/InvitationCover'
 
 const TOTAL_STEPS = 5
 
@@ -635,9 +636,86 @@ export default function CreatePage() {
             {templateForPreview && (
               <div>
                 <p className="text-xs tracking-widest uppercase text-[#7c6a52] mb-3">Pratinjau Template</p>
-                <div className="border border-[#e8e0d4] rounded overflow-hidden" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                  <div style={{ transform: 'scale(0.5)', transformOrigin: 'top left', width: '200%', pointerEvents: 'none' }}>
-                    <templateForPreview.component {...previewProps} />
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  {/* Phone body */}
+                  <div style={{
+                    position: 'relative',
+                    width: '220px',
+                    height: '460px',
+                    background: '#1c1c1e',
+                    borderRadius: '40px',
+                    padding: '14px 10px',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.35), 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.12)',
+                    flexShrink: 0,
+                  }}>
+                    {/* Volume buttons */}
+                    <div style={{ position: 'absolute', left: '-4px', top: '80px', width: '4px', height: '28px', background: '#3a3a3c', borderRadius: '2px 0 0 2px' }} />
+                    <div style={{ position: 'absolute', left: '-4px', top: '118px', width: '4px', height: '28px', background: '#3a3a3c', borderRadius: '2px 0 0 2px' }} />
+                    {/* Power button */}
+                    <div style={{ position: 'absolute', right: '-4px', top: '100px', width: '4px', height: '36px', background: '#3a3a3c', borderRadius: '0 2px 2px 0' }} />
+
+                    {/* Screen */}
+                    <div style={{
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '30px',
+                      overflow: 'hidden',
+                      position: 'relative',
+                      background: '#000',
+                    }}>
+                      {/* Dynamic island */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '52px',
+                        height: '14px',
+                        background: '#1c1c1e',
+                        borderRadius: '7px',
+                        zIndex: 3,
+                      }} />
+
+                      {/* Scrollable area */}
+                      <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        overflowY: 'auto',
+                        overflowX: 'hidden',
+                        scrollbarWidth: 'none',
+                      }}>
+                        <div style={{
+                          zoom: 0.51,
+                          pointerEvents: 'none',
+                        }}>
+                          <templateForPreview.component {...previewProps} />
+                        </div>
+                      </div>
+
+                      {/* Cover overlay — contained inside screen */}
+                      <InvitationCover
+                        contained
+                        compact
+                        brideName={form.brideName || 'Nama Mempelai Wanita'}
+                        groomName={form.groomName || 'Nama Mempelai Pria'}
+                        weddingDate={form.weddingDate || '2026-06-15'}
+                        templateId={form.templateId || 'elegant'}
+                        coverPhoto={form.photoPreviews[0]}
+                      />
+
+                      {/* Home indicator */}
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '8px',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        width: '48px',
+                        height: '4px',
+                        background: 'rgba(255,255,255,0.3)',
+                        borderRadius: '2px',
+                        zIndex: 3,
+                      }} />
+                    </div>
                   </div>
                 </div>
               </div>

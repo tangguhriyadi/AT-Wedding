@@ -45,6 +45,9 @@ const dancingScript = Dancing_Script({
 export const metadata: Metadata = {
   title: "AT Wedding | Platform Undangan Digital Pernikahan",
   description: "Buat undangan pernikahan digital yang indah dan bagikan kepada seluruh tamu dengan mudah. Pilih template elegan, modern, atau rustic.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

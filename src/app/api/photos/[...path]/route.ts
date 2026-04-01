@@ -37,7 +37,7 @@ export async function GET(
     const contentType = result.ContentType ?? 'application/octet-stream'
     const bytes = await result.Body.transformToByteArray()
 
-    return new Response(bytes, {
+    return new Response(Buffer.from(bytes), {
       status: 200,
       headers: {
         'Content-Type': contentType,
