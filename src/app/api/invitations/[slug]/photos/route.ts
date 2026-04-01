@@ -50,7 +50,8 @@ export async function POST(
         })
       )
 
-      savedPaths.push(`${process.env.S3_ENDPOINT}/${BUCKET}/${filename}`)
+      const publicBase = process.env.S3_PUBLIC_URL ?? `${process.env.S3_ENDPOINT}`
+      savedPaths.push(`${publicBase}/${BUCKET}/${filename}`)
     }
 
     invitation.photos = [...invitation.photos, ...savedPaths]
