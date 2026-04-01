@@ -40,8 +40,8 @@ jobs:
           USER_NAME : ${{ secrets.SERVER_USERNAME  }}
         
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          echo "$PRIVATE_KEY" | base64 -d > private_key && chmod 600 private_key                                                                                                                             
+            ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
 
             whoami
             docker stop ${{ vars.CONTAINER_NAME }} || true && docker container rm ${{vars.CONTAINER_NAME}} || true && docker image rm -f tangguhriyadi/${{ vars.IMAGE_NAME }} || true
