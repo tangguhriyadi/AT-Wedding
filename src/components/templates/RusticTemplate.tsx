@@ -7,6 +7,9 @@ export default function RusticTemplate({
   weddingTime,
   venue,
   venueAddress,
+  akadVenue,
+  akadTime,
+  googleMapsUrl,
   photos,
   message,
 }: TemplateProps) {
@@ -193,64 +196,44 @@ export default function RusticTemplate({
           Tanggal &amp; Waktu
         </p>
 
+        {/* Date box */}
         <div
           style={{
             display: 'inline-block',
             background: parchment,
             border: `1px solid ${sage}40`,
-            padding: '40px 56px',
+            padding: '32px 56px',
             maxWidth: 400,
             width: '100%',
             position: 'relative',
+            marginBottom: (akadTime || weddingTime) ? 20 : 0,
           }}
         >
-          {/* Wood grain texture using border */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 6,
-              border: `1px dashed ${sage}30`,
-              pointerEvents: 'none',
-            }}
-          />
-
-          <h2
-            style={{
-              fontFamily: fontScript,
-              fontSize: 'clamp(1.8rem, 5vw, 2.8rem)',
-              color: brownDark,
-              margin: '0 0 8px',
-              fontWeight: 600,
-            }}
-          >
+          <div style={{ position: 'absolute', inset: 6, border: `1px dashed ${sage}30`, pointerEvents: 'none' }} />
+          <h2 style={{ fontFamily: fontScript, fontSize: 'clamp(1.8rem, 5vw, 2.8rem)', color: brownDark, margin: 0, fontWeight: 600 }}>
             {weddingDate}
           </h2>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              margin: '12px 0',
-              color: terracotta,
-            }}
-          >
-            <span style={{ flex: 1, height: 1, background: `${sage}40` }} />
-            <span style={{ fontSize: 14 }}>❀</span>
-            <span style={{ flex: 1, height: 1, background: `${sage}40` }} />
-          </div>
-          <p
-            style={{
-              fontFamily: fontBody,
-              fontSize: '1.1rem',
-              fontStyle: 'italic',
-              color: brownLight,
-              margin: 0,
-            }}
-          >
-            {weddingTime}
-          </p>
         </div>
+
+        {/* Times */}
+        {(akadTime || weddingTime) && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            {akadTime && (
+              <div style={{ background: parchment, border: `1px solid ${sage}30`, padding: '16px 32px', minWidth: 140, textAlign: 'center' }}>
+                <p style={{ fontFamily: fontSans, fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: sage, marginBottom: 6 }}>Akad</p>
+                <p style={{ fontFamily: fontBody, fontSize: '1.1rem', fontStyle: 'italic', color: brownLight, margin: 0 }}>{akadTime}</p>
+              </div>
+            )}
+            {weddingTime && (
+              <div style={{ background: parchment, border: `1px solid ${sage}30`, padding: '16px 32px', minWidth: 140, textAlign: 'center' }}>
+                <p style={{ fontFamily: fontSans, fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: sage, marginBottom: 6 }}>
+                  {akadTime ? 'Resepsi' : 'Waktu'}
+                </p>
+                <p style={{ fontFamily: fontBody, fontSize: '1.1rem', fontStyle: 'italic', color: brownLight, margin: 0 }}>{weddingTime}</p>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── VENUE ─────────────────────────────── */}
@@ -277,31 +260,85 @@ export default function RusticTemplate({
 
         <div style={{ fontSize: 28, color: `${terracotta}60`, marginBottom: 16 }}>🏡</div>
 
-        <h2
-          style={{
-            fontFamily: fontScript,
-            fontSize: 'clamp(1.8rem, 5vw, 3rem)',
-            color: brownDark,
-            margin: '0 0 12px',
-            fontWeight: 600,
-          }}
-        >
-          {venue}
-        </h2>
-        {venueAddress && (
-          <p
-            style={{
-              fontFamily: fontBody,
-              fontSize: '1rem',
-              fontStyle: 'italic',
-              color: brownLight,
-              maxWidth: 440,
-              margin: '0 auto',
-              lineHeight: 1.8,
-            }}
-          >
-            {venueAddress}
-          </p>
+        {/* Akad venue */}
+        {akadVenue && (
+          <div style={{ marginBottom: venue ? 32 : 0 }}>
+            <p style={{ fontFamily: fontSans, fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: sage, marginBottom: 8 }}>Akad</p>
+            <h2 style={{ fontFamily: fontScript, fontSize: 'clamp(1.6rem, 4.5vw, 2.6rem)', color: brownDark, margin: '0 0 8px', fontWeight: 600 }}>
+              {akadVenue}
+            </h2>
+          </div>
+        )}
+
+        {/* Divider */}
+        {akadVenue && venue && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 24, color: terracotta }}>
+            <span style={{ flex: 1, maxWidth: 40, height: 1, background: `${sage}40` }} />
+            <span style={{ fontSize: 14 }}>❀</span>
+            <span style={{ flex: 1, maxWidth: 40, height: 1, background: `${sage}40` }} />
+          </div>
+        )}
+
+        {/* Resepsi venue */}
+        {venue && (
+          <div>
+            {akadVenue && (
+              <p style={{ fontFamily: fontSans, fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: sage, marginBottom: 8 }}>Resepsi</p>
+            )}
+            <h2
+              style={{
+                fontFamily: fontScript,
+                fontSize: 'clamp(1.8rem, 5vw, 3rem)',
+                color: brownDark,
+                margin: '0 0 12px',
+                fontWeight: 600,
+              }}
+            >
+              {venue}
+            </h2>
+            {venueAddress && (
+              <p
+                style={{
+                  fontFamily: fontBody,
+                  fontSize: '1rem',
+                  fontStyle: 'italic',
+                  color: brownLight,
+                  maxWidth: 440,
+                  margin: '0 auto',
+                  lineHeight: 1.8,
+                }}
+              >
+                {venueAddress}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Google Maps button */}
+        {googleMapsUrl && (
+          <div style={{ marginTop: 24 }}>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                border: `1px solid ${sage}`,
+                color: sage,
+                fontFamily: fontSans,
+                fontSize: '0.7rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                padding: '10px 24px',
+                textDecoration: 'none',
+                background: parchment,
+              }}
+            >
+              🗺 Buka Google Maps
+            </a>
+          </div>
         )}
 
         {/* Leaf separator */}

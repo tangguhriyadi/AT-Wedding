@@ -7,11 +7,21 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    const { brideName, groomName, weddingDate, weddingTime, venue, venueAddress, templateId, message } = body
+    const { brideName, groomName, weddingDate, weddingTime, venue, venueAddress, akadVenue, akadTime, googleMapsUrl, templateId, message } = body
 
-    if (!brideName || !groomName || !weddingDate || !weddingTime || !venue || !templateId) {
+    if (!brideName || !groomName || !weddingDate || !templateId) {
       return Response.json(
-        { error: 'Missing required fields: brideName, groomName, weddingDate, weddingTime, venue, templateId' },
+        { error: 'Missing required fields: brideName, groomName, weddingDate, templateId' },
+        { status: 400 }
+      )
+    }
+
+    // At least one of resepsi or akad must be provided
+    const hasResepsi = !!(venue && weddingTime)
+    const hasAkad = !!(akadVenue && akadTime)
+    if (!hasResepsi && !hasAkad) {
+      return Response.json(
+        { error: 'At least one event (resepsi or akad) must be provided with venue and time' },
         { status: 400 }
       )
     }
@@ -23,9 +33,12 @@ export async function POST(request: NextRequest) {
       brideName,
       groomName,
       weddingDate,
-      weddingTime,
-      venue,
+      weddingTime: weddingTime ?? '',
+      venue: venue ?? '',
       venueAddress: venueAddress ?? undefined,
+      akadVenue: akadVenue ?? undefined,
+      akadTime: akadTime ?? undefined,
+      googleMapsUrl: googleMapsUrl ?? undefined,
       templateId,
       photos: [],
       message: message ?? undefined,

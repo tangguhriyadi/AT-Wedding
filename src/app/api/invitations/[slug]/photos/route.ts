@@ -1,4 +1,4 @@
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
+import { CreateBucketCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import type { NextRequest } from 'next/server'
 import { findBySlug, saveInvitation } from '@/lib/storage'
 
@@ -31,6 +31,13 @@ export async function POST(
 
     if (!files || files.length === 0) {
       return Response.json({ error: 'No photos provided' }, { status: 400 })
+    }
+
+    // Ensure bucket exists (create if missing)
+    try {
+      await s3.send(new CreateBucketCommand({ Bucket: BUCKET }))
+    } catch {
+      // Bucket likely already exists — ignore
     }
 
     const savedPaths: string[] = []

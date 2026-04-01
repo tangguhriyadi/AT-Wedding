@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { findBySlug } from '@/lib/storage'
 import { getTemplateById, ElegantTemplate } from '@/components/templates'
@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const title = `Undangan Pernikahan ${invitation.brideName} & ${invitation.groomName}`
-  const description = `Kami mengundang Anda ke pernikahan ${invitation.brideName} & ${invitation.groomName} pada ${invitation.weddingDate} di ${invitation.venue}`
+  const description = `Kami mengundang Anda ke pernikahan ${invitation.brideName} & ${invitation.groomName} pada ${invitation.weddingDate} di ${invitation.venue || invitation.akadVenue || ''}`
   const ogImage = invitation.photos?.[0]
 
   return {
@@ -39,6 +39,16 @@ export default async function WeddingPage({ params }: Props) {
     notFound()
   }
 
+  // Improvement 3: Redirect to landing page after H+1
+  const weddingDate = new Date(invitation.weddingDate)
+  const expireDate = new Date(weddingDate)
+  expireDate.setDate(expireDate.getDate() + 1) // H+1
+  expireDate.setHours(23, 59, 59, 999) // End of H+1 day
+  const now = new Date()
+  if (now > expireDate) {
+    redirect('/')
+  }
+
   const templateConfig = getTemplateById(invitation.templateId)
   const TemplateComponent = templateConfig?.component ?? ElegantTemplate
 
@@ -51,6 +61,9 @@ export default async function WeddingPage({ params }: Props) {
         weddingTime={invitation.weddingTime}
         venue={invitation.venue}
         venueAddress={invitation.venueAddress}
+        akadVenue={invitation.akadVenue}
+        akadTime={invitation.akadTime}
+        googleMapsUrl={invitation.googleMapsUrl}
         photos={invitation.photos}
         message={invitation.message}
       />

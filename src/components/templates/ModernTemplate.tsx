@@ -7,6 +7,9 @@ export default function ModernTemplate({
   weddingTime,
   venue,
   venueAddress,
+  akadVenue,
+  akadTime,
+  googleMapsUrl,
   photos,
   message,
 }: TemplateProps) {
@@ -178,84 +181,44 @@ export default function ModernTemplate({
           Tanggal &amp; Waktu
         </p>
 
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'stretch',
-            gap: 0,
-            maxWidth: 480,
-            width: '100%',
-            border: `2px solid ${accent}`,
-          }}
-        >
-          <div
-            style={{
-              background: accent,
-              color: white,
-              padding: '32px 40px',
-              flex: 1,
-            }}
-          >
-            <p
-              style={{
-                fontSize: '0.6rem',
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: accentBright,
-                fontWeight: 600,
-                marginBottom: 8,
-              }}
-            >
+        {/* Date + times block */}
+        <div style={{ display: 'inline-flex', flexDirection: 'column', gap: 0, maxWidth: 560, width: '100%', border: `2px solid ${accent}` }}>
+          {/* Date row */}
+          <div style={{ background: accent, color: white, padding: '24px 40px', textAlign: 'center' }}>
+            <p style={{ fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: accentBright, fontWeight: 600, marginBottom: 8 }}>
               Tanggal
             </p>
-            <p
-              style={{
-                fontSize: 'clamp(1rem, 3vw, 1.4rem)',
-                fontWeight: 700,
-                margin: 0,
-                lineHeight: 1.3,
-              }}
-            >
+            <p style={{ fontSize: 'clamp(1rem, 3vw, 1.4rem)', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
               {weddingDate}
             </p>
           </div>
-          <div
-            style={{
-              width: 2,
-              background: accentBright,
-            }}
-          />
-          <div
-            style={{
-              background: offWhite,
-              color: accent,
-              padding: '32px 40px',
-              flex: 1,
-            }}
-          >
-            <p
-              style={{
-                fontSize: '0.6rem',
-                letterSpacing: '0.3em',
-                textTransform: 'uppercase',
-                color: gray,
-                fontWeight: 600,
-                marginBottom: 8,
-              }}
-            >
-              Waktu
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(1rem, 3vw, 1.4rem)',
-                fontWeight: 700,
-                margin: 0,
-                lineHeight: 1.3,
-              }}
-            >
-              {weddingTime}
-            </p>
-          </div>
+
+          {/* Time row */}
+          {(akadTime || weddingTime) && (
+            <div style={{ display: 'flex', alignItems: 'stretch' }}>
+              {akadTime && (
+                <div style={{ background: offWhite, color: accent, padding: '24px 32px', flex: 1, textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gray, fontWeight: 600, marginBottom: 8 }}>
+                    Akad
+                  </p>
+                  <p style={{ fontSize: 'clamp(1rem, 3vw, 1.3rem)', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
+                    {akadTime}
+                  </p>
+                </div>
+              )}
+              {akadTime && weddingTime && <div style={{ width: 2, background: accentBright }} />}
+              {weddingTime && (
+                <div style={{ background: offWhite, color: accent, padding: '24px 32px', flex: 1, textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gray, fontWeight: 600, marginBottom: 8 }}>
+                    {akadTime ? 'Resepsi' : 'Waktu'}
+                  </p>
+                  <p style={{ fontSize: 'clamp(1rem, 3vw, 1.3rem)', fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
+                    {weddingTime}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -281,52 +244,79 @@ export default function ModernTemplate({
           Lokasi
         </p>
 
-        <div
-          style={{
-            display: 'inline-block',
-            position: 'relative',
-            maxWidth: 560,
-            width: '100%',
-          }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: 4,
-              height: '100%',
-              background: accentBright,
-            }}
-          />
-          <div style={{ paddingLeft: 28, textAlign: 'left' }}>
-            <h2
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 32, alignItems: 'center' }}>
+          {/* Akad venue */}
+          {akadVenue && (
+            <div style={{ display: 'inline-block', position: 'relative', maxWidth: 560, width: '100%' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', background: accentBright }} />
+              <div style={{ paddingLeft: 28, textAlign: 'left' }}>
+                <p style={{ fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gray, fontWeight: 600, marginBottom: 8 }}>
+                  Akad
+                </p>
+                <h2 style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2.2rem)', fontWeight: 800, color: accent, margin: 0, textTransform: 'uppercase', letterSpacing: '-0.01em' }}>
+                  {akadVenue}
+                </h2>
+              </div>
+            </div>
+          )}
+
+          {/* Resepsi venue */}
+          {venue && (
+            <div style={{ display: 'inline-block', position: 'relative', maxWidth: 560, width: '100%' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: 4, height: '100%', background: accentBright }} />
+              <div style={{ paddingLeft: 28, textAlign: 'left' }}>
+                {akadVenue && (
+                  <p style={{ fontSize: '0.6rem', letterSpacing: '0.3em', textTransform: 'uppercase', color: gray, fontWeight: 600, marginBottom: 8 }}>
+                    Resepsi
+                  </p>
+                )}
+                <h2
+                  style={{
+                    fontSize: 'clamp(1.6rem, 4vw, 2.5rem)',
+                    fontWeight: 800,
+                    color: accent,
+                    margin: '0 0 12px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {venue}
+                </h2>
+                {venueAddress && (
+                  <p style={{ fontSize: '0.9rem', color: gray, margin: 0, lineHeight: 1.7, fontWeight: 400 }}>
+                    {venueAddress}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Google Maps button */}
+        {googleMapsUrl && (
+          <div style={{ marginTop: 32 }}>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
-                fontSize: 'clamp(1.6rem, 4vw, 2.5rem)',
-                fontWeight: 800,
-                color: accent,
-                margin: '0 0 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: accentBright,
+                color: white,
+                fontWeight: 700,
+                fontSize: '0.75rem',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                letterSpacing: '-0.01em',
+                padding: '12px 28px',
+                textDecoration: 'none',
               }}
             >
-              {venue}
-            </h2>
-            {venueAddress && (
-              <p
-                style={{
-                  fontSize: '0.9rem',
-                  color: gray,
-                  margin: 0,
-                  lineHeight: 1.7,
-                  fontWeight: 400,
-                }}
-              >
-                {venueAddress}
-              </p>
-            )}
+              Buka Google Maps →
+            </a>
           </div>
-        </div>
+        )}
       </section>
 
       {/* ── PHOTO GALLERY ─────────────────────── */}

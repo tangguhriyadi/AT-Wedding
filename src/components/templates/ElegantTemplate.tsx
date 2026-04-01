@@ -7,6 +7,9 @@ export default function ElegantTemplate({
   weddingTime,
   venue,
   venueAddress,
+  akadVenue,
+  akadTime,
+  googleMapsUrl,
   photos,
   message,
 }: TemplateProps) {
@@ -148,18 +151,19 @@ export default function ElegantTemplate({
           Tanggal &amp; Waktu
         </p>
 
+        {/* Date box */}
         <div
           style={{
             display: 'inline-block',
             border: `1px solid ${gold}50`,
-            padding: '40px 56px',
+            padding: '32px 56px',
             position: 'relative',
             background: `linear-gradient(135deg, rgba(255,255,255,0.8), rgba(245,237,218,0.5))`,
             maxWidth: 420,
             width: '100%',
+            marginBottom: (akadTime || weddingTime) ? 24 : 0,
           }}
         >
-          {/* Border corner accents */}
           {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
             <span
               key={corner}
@@ -173,31 +177,43 @@ export default function ElegantTemplate({
               }}
             >◆</span>
           ))}
-
           <p
             style={{
               fontFamily: fontSerif,
               fontSize: 'clamp(1.4rem, 4vw, 2rem)',
               fontWeight: 600,
               color: dark,
-              margin: '0 0 8px',
+              margin: 0,
             }}
           >
             {weddingDate}
           </p>
-          <div style={{ width: 40, height: 1, background: gold, margin: '12px auto' }} />
-          <p
-            style={{
-              fontFamily: 'var(--font-geist-sans), Arial, sans-serif',
-              fontSize: '0.85rem',
-              letterSpacing: '0.15em',
-              color: mid,
-              margin: 0,
-            }}
-          >
-            {weddingTime}
-          </p>
         </div>
+
+        {/* Event times */}
+        {(akadTime || weddingTime) && (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 16, flexWrap: 'wrap' }}>
+            {akadTime && (
+              <div style={{ textAlign: 'center', minWidth: 140 }}>
+                <p style={{ fontFamily: 'var(--font-geist-sans), Arial, sans-serif', fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: gold, marginBottom: 6 }}>
+                  Akad
+                </p>
+                <p style={{ fontFamily: fontSerif, fontSize: '1.1rem', color: mid, margin: 0 }}>{akadTime}</p>
+              </div>
+            )}
+            {akadTime && weddingTime && (
+              <div style={{ width: 1, background: `${gold}40`, alignSelf: 'stretch' }} />
+            )}
+            {weddingTime && (
+              <div style={{ textAlign: 'center', minWidth: 140 }}>
+                <p style={{ fontFamily: 'var(--font-geist-sans), Arial, sans-serif', fontSize: '0.55rem', letterSpacing: '0.35em', textTransform: 'uppercase', color: gold, marginBottom: 6 }}>
+                  {akadTime ? 'Resepsi' : 'Waktu'}
+                </p>
+                <p style={{ fontFamily: fontSerif, fontSize: '1.1rem', color: mid, margin: 0 }}>{weddingTime}</p>
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* ── VENUE ─────────────────────────────── */}
@@ -222,37 +238,94 @@ export default function ElegantTemplate({
           Lokasi
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20, color: gold }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 28, color: gold }}>
           <span style={{ flex: 1, maxWidth: 60, height: 1, background: `linear-gradient(90deg, transparent, ${gold})` }} />
           <span>✦</span>
           <span style={{ flex: 1, maxWidth: 60, height: 1, background: `linear-gradient(90deg, ${gold}, transparent)` }} />
         </div>
 
-        <h2
-          style={{
-            fontFamily: fontSerif,
-            fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
-            fontWeight: 500,
-            color: dark,
-            margin: '0 0 12px',
-          }}
-        >
-          {venue}
-        </h2>
-        {venueAddress && (
-          <p
-            style={{
-              fontFamily: 'var(--font-geist-sans), Arial, sans-serif',
-              fontSize: '0.875rem',
-              color: mid,
-              letterSpacing: '0.05em',
-              maxWidth: 480,
-              margin: '0 auto',
-              lineHeight: 1.7,
-            }}
-          >
-            {venueAddress}
-          </p>
+        {/* Akad venue */}
+        {akadVenue && (
+          <div style={{ marginBottom: venue ? 40 : 0 }}>
+            <p style={{ fontFamily: 'var(--font-geist-sans), Arial, sans-serif', fontSize: '0.55rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: gold, marginBottom: 8 }}>
+              Akad
+            </p>
+            <h2 style={{ fontFamily: fontSerif, fontSize: 'clamp(1.4rem, 3.5vw, 2.2rem)', fontWeight: 500, color: dark, margin: '0 0 8px' }}>
+              {akadVenue}
+            </h2>
+          </div>
+        )}
+
+        {/* Divider between akad and resepsi */}
+        {akadVenue && venue && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 32, color: gold }}>
+            <span style={{ flex: 1, maxWidth: 40, height: 1, background: `${gold}40` }} />
+            <span style={{ fontSize: 10 }}>◆</span>
+            <span style={{ flex: 1, maxWidth: 40, height: 1, background: `${gold}40` }} />
+          </div>
+        )}
+
+        {/* Resepsi venue */}
+        {venue && (
+          <div>
+            {akadVenue && (
+              <p style={{ fontFamily: 'var(--font-geist-sans), Arial, sans-serif', fontSize: '0.55rem', letterSpacing: '0.4em', textTransform: 'uppercase', color: gold, marginBottom: 8 }}>
+                Resepsi
+              </p>
+            )}
+            <h2
+              style={{
+                fontFamily: fontSerif,
+                fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                fontWeight: 500,
+                color: dark,
+                margin: '0 0 12px',
+              }}
+            >
+              {venue}
+            </h2>
+            {venueAddress && (
+              <p
+                style={{
+                  fontFamily: 'var(--font-geist-sans), Arial, sans-serif',
+                  fontSize: '0.875rem',
+                  color: mid,
+                  letterSpacing: '0.05em',
+                  maxWidth: 480,
+                  margin: '0 auto',
+                  lineHeight: 1.7,
+                }}
+              >
+                {venueAddress}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Google Maps button */}
+        {googleMapsUrl && (
+          <div style={{ marginTop: 28 }}>
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                border: `1px solid ${gold}`,
+                color: gold,
+                fontFamily: 'var(--font-geist-sans), Arial, sans-serif',
+                fontSize: '0.7rem',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                padding: '10px 24px',
+                textDecoration: 'none',
+              }}
+            >
+              ✦ Buka Google Maps
+            </a>
+          </div>
         )}
       </section>
 

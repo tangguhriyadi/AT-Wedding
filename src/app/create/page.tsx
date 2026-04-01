@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import Link from 'next/link'
 import { TEMPLATES } from '@/components/templates'
 import type { TemplateProps } from '@/types/invitation'
 
@@ -11,9 +12,15 @@ interface FormData {
   brideName: string
   groomName: string
   weddingDate: string
+  // Resepsi
   weddingTime: string
   venue: string
   venueAddress: string
+  // Akad
+  akadVenue: string
+  akadTime: string
+  // Maps
+  googleMapsUrl: string
   message: string
   photos: File[]
   photoPreviews: string[]
@@ -27,6 +34,9 @@ const initialForm: FormData = {
   weddingTime: '',
   venue: '',
   venueAddress: '',
+  akadVenue: '',
+  akadTime: '',
+  googleMapsUrl: '',
   message: '',
   photos: [],
   photoPreviews: [],
@@ -54,8 +64,19 @@ export default function CreatePage() {
     }
     if (s === 3) {
       if (!form.weddingDate) e.weddingDate = 'Tanggal pernikahan wajib diisi'
-      if (!form.weddingTime) e.weddingTime = 'Waktu pernikahan wajib diisi'
-      if (!form.venue.trim()) e.venue = 'Nama tempat wajib diisi'
+
+      const hasResepsi = !!(form.venue.trim() && form.weddingTime)
+      const hasAkad = !!(form.akadVenue.trim() && form.akadTime)
+
+      if (!hasResepsi && !hasAkad) {
+        e.eventRequired = 'Minimal salah satu acara (Akad atau Resepsi) harus diisi lengkap'
+      }
+      // Partial akad
+      if (form.akadVenue.trim() && !form.akadTime) e.akadTime = 'Waktu Akad wajib diisi jika Lokasi Akad diisi'
+      if (!form.akadVenue.trim() && form.akadTime) e.akadVenue = 'Lokasi Akad wajib diisi jika Waktu Akad diisi'
+      // Partial resepsi
+      if (form.venue.trim() && !form.weddingTime) e.weddingTime = 'Waktu Resepsi wajib diisi jika Lokasi Resepsi diisi'
+      if (!form.venue.trim() && form.weddingTime) e.venue = 'Lokasi Resepsi wajib diisi jika Waktu Resepsi diisi'
     }
     setErrors(e)
     return Object.keys(e).length === 0
@@ -98,7 +119,6 @@ export default function CreatePage() {
     if (!validateStep(step)) return
     setSubmitting(true)
     try {
-      // 1. Create invitation
       const res = await fetch('/api/invitations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -106,9 +126,12 @@ export default function CreatePage() {
           brideName: form.brideName,
           groomName: form.groomName,
           weddingDate: form.weddingDate,
-          weddingTime: form.weddingTime,
-          venue: form.venue,
+          weddingTime: form.weddingTime || undefined,
+          venue: form.venue || undefined,
           venueAddress: form.venueAddress || undefined,
+          akadVenue: form.akadVenue || undefined,
+          akadTime: form.akadTime || undefined,
+          googleMapsUrl: form.googleMapsUrl || undefined,
           templateId: form.templateId,
           message: form.message || undefined,
         }),
@@ -116,14 +139,16 @@ export default function CreatePage() {
       if (!res.ok) throw new Error('Gagal membuat undangan')
       const invitation = await res.json()
 
-      // 2. Upload photos if any
       if (form.photos.length > 0) {
         const fd = new FormData()
         for (const photo of form.photos) fd.append('photos', photo)
-        await fetch(`/api/invitations/${invitation.slug}/photos`, {
+        const photoRes = await fetch(`/api/invitations/${invitation.slug}/photos`, {
           method: 'POST',
           body: fd,
         })
+        if (!photoRes.ok) {
+          console.error('Photo upload failed:', await photoRes.text())
+        }
       }
 
       setSuccessUrl(`/wedding/${invitation.slug}`)
@@ -162,6 +187,11 @@ export default function CreatePage() {
               Salin Tautan
             </button>
           </div>
+          <div className="mt-6">
+            <Link href="/" className="text-[#7c6a52] text-sm hover:text-[#2c2016]">
+              ← Kembali ke Beranda
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -171,24 +201,39 @@ export default function CreatePage() {
   const previewProps: TemplateProps = {
     brideName: form.brideName || 'Nama Mempelai Wanita',
     groomName: form.groomName || 'Nama Mempelai Pria',
-    weddingDate: form.weddingDate || '2026-01-01',
-    weddingTime: form.weddingTime || '10:00',
-    venue: form.venue || 'Nama Tempat',
+    weddingDate: form.weddingDate || '2026-06-15',
+    weddingTime: form.weddingTime || (form.akadTime ? '' : '10:00'),
+    venue: form.venue || (form.akadVenue ? '' : 'Nama Gedung'),
     venueAddress: form.venueAddress || undefined,
-    photos: [],
+    akadVenue: form.akadVenue || undefined,
+    akadTime: form.akadTime || undefined,
+    googleMapsUrl: form.googleMapsUrl || undefined,
+    photos: form.photoPreviews,
     message: form.message || undefined,
   }
 
   return (
     <div className="min-h-screen bg-[#f9f5ee]">
       {/* Header */}
-      <header className="border-b border-[#c4973c]/20 bg-[#f9f5ee] py-4 px-4 text-center">
-        <p className="text-xs tracking-[0.3em] uppercase text-[#c4973c]" style={{ fontFamily: 'Georgia, serif' }}>
-          AT Wedding
-        </p>
-        <h1 className="text-xl font-light italic text-[#2c2016] mt-1" style={{ fontFamily: 'Georgia, serif' }}>
-          Buat Undangan Pernikahan
-        </h1>
+      <header className="border-b border-[#c4973c]/20 bg-[#f9f5ee] py-4 px-4">
+        <div className="max-w-2xl mx-auto flex items-center justify-between">
+          {/* Bug 1 fix: back to dashboard button */}
+          <Link
+            href="/"
+            className="text-[#c4973c] text-sm hover:text-[#b08530] transition-colors flex items-center gap-1"
+          >
+            ← Dashboard
+          </Link>
+          <div className="text-center flex-1">
+            <p className="text-xs tracking-[0.3em] uppercase text-[#c4973c]" style={{ fontFamily: 'Georgia, serif' }}>
+              AT Wedding
+            </p>
+            <h1 className="text-xl font-light italic text-[#2c2016] mt-1" style={{ fontFamily: 'Georgia, serif' }}>
+              Buat Undangan Pernikahan
+            </h1>
+          </div>
+          <div className="w-20" /> {/* Spacer to center heading */}
+        </div>
       </header>
 
       {/* Progress bar */}
@@ -208,7 +253,7 @@ export default function CreatePage() {
       {/* Step content */}
       <div className="max-w-2xl mx-auto px-4 py-6">
 
-        {/* Step 1: Template */}
+        {/* Step 1: Template — Bug 2 fix: render actual template mini preview */}
         {step === 1 && (
           <div>
             <h2 className="text-2xl font-light italic text-[#2c2016] mb-1" style={{ fontFamily: 'Georgia, serif' }}>
@@ -217,26 +262,47 @@ export default function CreatePage() {
             <p className="text-sm text-[#7c6a52] mb-6">Pilih tampilan undangan yang Anda inginkan</p>
             {errors.templateId && <p className="text-red-500 text-sm mb-4">{errors.templateId}</p>}
             <div className="grid gap-4 sm:grid-cols-3">
-              {TEMPLATES.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => updateField('templateId', t.id)}
-                  className={`border-2 rounded p-4 text-left transition-all ${
-                    form.templateId === t.id
-                      ? 'border-[#c4973c] bg-[#c4973c]/5'
-                      : 'border-[#e8e0d4] bg-white hover:border-[#c4973c]/50'
-                  }`}
-                >
-                  <div className="w-full aspect-[3/4] bg-[#f0ebe3] rounded mb-3 flex items-center justify-center text-4xl text-[#c4973c]/30">
-                    ❦
-                  </div>
-                  <p className="font-medium text-[#2c2016] text-sm mb-1">{t.name}</p>
-                  <p className="text-xs text-[#7c6a52] leading-relaxed">{t.description}</p>
-                  {form.templateId === t.id && (
-                    <div className="mt-2 text-[#c4973c] text-xs font-medium">✓ Dipilih</div>
-                  )}
-                </button>
-              ))}
+              {TEMPLATES.map((t) => {
+                const demoProps: TemplateProps = {
+                  brideName: 'Siti',
+                  groomName: 'Budi',
+                  weddingDate: '2026-06-15',
+                  weddingTime: '10:00',
+                  venue: 'Gedung Mulia',
+                  photos: [],
+                }
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => updateField('templateId', t.id)}
+                    className={`border-2 rounded p-4 text-left transition-all ${
+                      form.templateId === t.id
+                        ? 'border-[#c4973c] bg-[#c4973c]/5'
+                        : 'border-[#e8e0d4] bg-white hover:border-[#c4973c]/50'
+                    }`}
+                  >
+                    {/* Mini template preview */}
+                    <div className="w-full aspect-[3/4] overflow-hidden rounded mb-3 relative bg-[#f0ebe3]">
+                      <div style={{
+                        position: 'absolute',
+                        top: 0, left: 0,
+                        width: '300%',
+                        height: '300%',
+                        transform: 'scale(0.333)',
+                        transformOrigin: 'top left',
+                        pointerEvents: 'none',
+                      }}>
+                        <t.component {...demoProps} />
+                      </div>
+                    </div>
+                    <p className="font-medium text-[#2c2016] text-sm mb-1">{t.name}</p>
+                    <p className="text-xs text-[#7c6a52] leading-relaxed">{t.description}</p>
+                    {form.templateId === t.id && (
+                      <div className="mt-2 text-[#c4973c] text-xs font-medium">✓ Dipilih</div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
@@ -289,65 +355,132 @@ export default function CreatePage() {
             <h2 className="text-2xl font-light italic text-[#2c2016] mb-1" style={{ fontFamily: 'Georgia, serif' }}>
               Detail Pernikahan
             </h2>
-            <p className="text-sm text-[#7c6a52] mb-6">Informasi waktu dan tempat pernikahan</p>
-            <div className="space-y-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
-                    Tanggal Pernikahan
-                  </label>
-                  <input
-                    type="date"
-                    value={form.weddingDate}
-                    onChange={(e) => updateField('weddingDate', e.target.value)}
-                    className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
-                      errors.weddingDate ? 'border-red-400' : 'border-[#e8e0d4]'
-                    }`}
-                  />
-                  {errors.weddingDate && <p className="text-red-500 text-xs mt-1">{errors.weddingDate}</p>}
-                </div>
-                <div>
-                  <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
-                    Waktu
-                  </label>
-                  <input
-                    type="time"
-                    value={form.weddingTime}
-                    onChange={(e) => updateField('weddingTime', e.target.value)}
-                    className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
-                      errors.weddingTime ? 'border-red-400' : 'border-[#e8e0d4]'
-                    }`}
-                  />
-                  {errors.weddingTime && <p className="text-red-500 text-xs mt-1">{errors.weddingTime}</p>}
-                </div>
+            <p className="text-sm text-[#7c6a52] mb-6">
+              Informasi tanggal dan tempat pernikahan. Isi minimal salah satu acara (Akad atau Resepsi).
+            </p>
+
+            {errors.eventRequired && (
+              <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded mb-5">
+                {errors.eventRequired}
               </div>
+            )}
+
+            <div className="space-y-6">
+              {/* Shared date */}
               <div>
                 <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
-                  Tempat
+                  Tanggal Pernikahan
                 </label>
                 <input
-                  type="text"
-                  value={form.venue}
-                  onChange={(e) => updateField('venue', e.target.value)}
-                  placeholder="Contoh: Gedung Serbaguna Mulia"
+                  type="date"
+                  value={form.weddingDate}
+                  onChange={(e) => updateField('weddingDate', e.target.value)}
                   className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
-                    errors.venue ? 'border-red-400' : 'border-[#e8e0d4]'
+                    errors.weddingDate ? 'border-red-400' : 'border-[#e8e0d4]'
                   }`}
                 />
-                {errors.venue && <p className="text-red-500 text-xs mt-1">{errors.venue}</p>}
+                {errors.weddingDate && <p className="text-red-500 text-xs mt-1">{errors.weddingDate}</p>}
               </div>
+
+              {/* Akad section */}
+              <div className="border border-[#e8e0d4] rounded p-4 bg-white">
+                <p className="text-xs tracking-widest uppercase text-[#c4973c] mb-4">Akad <span className="normal-case text-[#7c6a52]/70">(opsional)</span></p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
+                      Lokasi Akad
+                    </label>
+                    <input
+                      type="text"
+                      value={form.akadVenue}
+                      onChange={(e) => updateField('akadVenue', e.target.value)}
+                      placeholder="Contoh: Masjid Al-Ikhlas"
+                      className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
+                        errors.akadVenue ? 'border-red-400' : 'border-[#e8e0d4]'
+                      }`}
+                    />
+                    {errors.akadVenue && <p className="text-red-500 text-xs mt-1">{errors.akadVenue}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
+                      Waktu Akad
+                    </label>
+                    <input
+                      type="time"
+                      value={form.akadTime}
+                      onChange={(e) => updateField('akadTime', e.target.value)}
+                      className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
+                        errors.akadTime ? 'border-red-400' : 'border-[#e8e0d4]'
+                      }`}
+                    />
+                    {errors.akadTime && <p className="text-red-500 text-xs mt-1">{errors.akadTime}</p>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Resepsi section */}
+              <div className="border border-[#e8e0d4] rounded p-4 bg-white">
+                <p className="text-xs tracking-widest uppercase text-[#c4973c] mb-4">Resepsi <span className="normal-case text-[#7c6a52]/70">(opsional)</span></p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
+                      Lokasi Resepsi
+                    </label>
+                    <input
+                      type="text"
+                      value={form.venue}
+                      onChange={(e) => updateField('venue', e.target.value)}
+                      placeholder="Contoh: Gedung Serbaguna Mulia"
+                      className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
+                        errors.venue ? 'border-red-400' : 'border-[#e8e0d4]'
+                      }`}
+                    />
+                    {errors.venue && <p className="text-red-500 text-xs mt-1">{errors.venue}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
+                      Waktu Resepsi
+                    </label>
+                    <input
+                      type="time"
+                      value={form.weddingTime}
+                      onChange={(e) => updateField('weddingTime', e.target.value)}
+                      className={`w-full border px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm ${
+                        errors.weddingTime ? 'border-red-400' : 'border-[#e8e0d4]'
+                      }`}
+                    />
+                    {errors.weddingTime && <p className="text-red-500 text-xs mt-1">{errors.weddingTime}</p>}
+                  </div>
+                  <div>
+                    <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
+                      Alamat Lokasi <span className="normal-case text-[#7c6a52]/70">(opsional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={form.venueAddress}
+                      onChange={(e) => updateField('venueAddress', e.target.value)}
+                      placeholder="Contoh: Jl. Sudirman No. 10, Jakarta"
+                      className="w-full border border-[#e8e0d4] px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Google Maps */}
               <div>
                 <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
-                  Alamat Tempat <span className="normal-case text-[#7c6a52]/70">(opsional)</span>
+                  Google Maps Link <span className="normal-case text-[#7c6a52]/70">(opsional)</span>
                 </label>
                 <input
-                  type="text"
-                  value={form.venueAddress}
-                  onChange={(e) => updateField('venueAddress', e.target.value)}
-                  placeholder="Contoh: Jl. Sudirman No. 10, Jakarta"
+                  type="url"
+                  value={form.googleMapsUrl}
+                  onChange={(e) => updateField('googleMapsUrl', e.target.value)}
+                  placeholder="https://maps.google.com/..."
                   className="w-full border border-[#e8e0d4] px-4 py-3 text-[#2c2016] bg-white focus:outline-none focus:border-[#c4973c] text-sm"
                 />
               </div>
+
+              {/* Message */}
               <div>
                 <label className="block text-xs tracking-widest uppercase text-[#7c6a52] mb-2">
                   Pesan Khusus <span className="normal-case text-[#7c6a52]/70">(opsional)</span>
@@ -372,7 +505,6 @@ export default function CreatePage() {
             </h2>
             <p className="text-sm text-[#7c6a52] mb-6">Tambahkan foto-foto untuk ditampilkan di undangan Anda (opsional)</p>
 
-            {/* Drop zone */}
             <div
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
@@ -395,7 +527,6 @@ export default function CreatePage() {
               />
             </div>
 
-            {/* Previews */}
             {form.photoPreviews.length > 0 && (
               <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
                 {form.photoPreviews.map((src, i) => (
@@ -423,11 +554,10 @@ export default function CreatePage() {
         {step === 5 && (
           <div>
             <h2 className="text-2xl font-light italic text-[#2c2016] mb-1" style={{ fontFamily: 'Georgia, serif' }}>
-              Konfirmasi & Pratinjau
+              Konfirmasi &amp; Pratinjau
             </h2>
             <p className="text-sm text-[#7c6a52] mb-6">Periksa kembali data undangan Anda sebelum dibuat</p>
 
-            {/* Summary */}
             <div className="bg-white border border-[#e8e0d4] rounded p-5 mb-6 space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-[#7c6a52]">Template</span>
@@ -449,18 +579,40 @@ export default function CreatePage() {
                 <span className="text-[#7c6a52]">Tanggal</span>
                 <span className="text-[#2c2016]">{form.weddingDate}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-[#7c6a52]">Waktu</span>
-                <span className="text-[#2c2016]">{form.weddingTime}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#7c6a52]">Tempat</span>
-                <span className="text-[#2c2016]">{form.venue}</span>
-              </div>
+              {form.akadVenue && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-[#7c6a52]">Lokasi Akad</span>
+                    <span className="text-[#2c2016]">{form.akadVenue}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#7c6a52]">Waktu Akad</span>
+                    <span className="text-[#2c2016]">{form.akadTime}</span>
+                  </div>
+                </>
+              )}
+              {form.venue && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-[#7c6a52]">Lokasi Resepsi</span>
+                    <span className="text-[#2c2016]">{form.venue}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#7c6a52]">Waktu Resepsi</span>
+                    <span className="text-[#2c2016]">{form.weddingTime}</span>
+                  </div>
+                </>
+              )}
               {form.venueAddress && (
                 <div className="flex justify-between">
                   <span className="text-[#7c6a52]">Alamat</span>
                   <span className="text-[#2c2016] text-right max-w-[60%]">{form.venueAddress}</span>
+                </div>
+              )}
+              {form.googleMapsUrl && (
+                <div className="flex justify-between">
+                  <span className="text-[#7c6a52]">Google Maps</span>
+                  <span className="text-[#c4973c] text-right max-w-[60%] truncate">✓ Ditambahkan</span>
                 </div>
               )}
               {form.message && (
