@@ -1,7 +1,18 @@
-import { writeFileSync, mkdirSync, existsSync } from 'fs'
-import { join } from 'path'
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import type { NextRequest } from 'next/server'
 import { findBySlug, saveInvitation } from '@/lib/storage'
+
+const s3 = new S3Client({
+  endpoint: process.env.S3_ENDPOINT,
+  region: process.env.S3_REGION ?? 'ap-northeast-2',
+  credentials: {
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+  },
+  forcePathStyle: true,
+})
+
+const BUCKET = 'wedding-photos'
 
 export async function POST(
   request: NextRequest,
@@ -9,7 +20,7 @@ export async function POST(
 ) {
   try {
     const { slug } = await params
-    const invitation = findBySlug(slug)
+    const invitation = await findBySlug(slug)
 
     if (!invitation) {
       return Response.json({ error: 'Invitation not found' }, { status: 404 })
@@ -22,26 +33,29 @@ export async function POST(
       return Response.json({ error: 'No photos provided' }, { status: 400 })
     }
 
-    const uploadDir = join(process.cwd(), 'public', 'uploads', slug)
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true })
-    }
-
     const savedPaths: string[] = []
 
     for (const file of files) {
       if (!(file instanceof File)) continue
 
       const buffer = Buffer.from(await file.arrayBuffer())
-      const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
-      const filePath = join(uploadDir, filename)
-      writeFileSync(filePath, buffer)
-      savedPaths.push(`/uploads/${slug}/${filename}`)
+      const filename = `${slug}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: BUCKET,
+          Key: filename,
+          Body: buffer,
+          ContentType: file.type,
+        })
+      )
+
+      savedPaths.push(`${process.env.S3_ENDPOINT}/${BUCKET}/${filename}`)
     }
 
     invitation.photos = [...invitation.photos, ...savedPaths]
     invitation.updatedAt = new Date().toISOString()
-    saveInvitation(invitation)
+    await saveInvitation(invitation)
 
     return Response.json(invitation)
   } catch {

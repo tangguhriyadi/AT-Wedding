@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const now = new Date().toISOString()
     const invitation: Invitation = {
       id: randomUUID(),
-      slug: generateSlug(brideName, groomName),
+      slug: await generateSlug(brideName, groomName),
       brideName,
       groomName,
       weddingDate,
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       updatedAt: now,
     }
 
-    saveInvitation(invitation)
+    await saveInvitation(invitation)
 
     return Response.json(invitation, { status: 201 })
   } catch {

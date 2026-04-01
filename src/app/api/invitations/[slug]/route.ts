@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { slug } = await params
-    const invitation = findBySlug(slug)
+    const invitation = await findBySlug(slug)
 
     if (!invitation) {
       return Response.json({ error: 'Invitation not found' }, { status: 404 })

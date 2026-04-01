@@ -1,47 +1,73 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
-import { join } from 'path'
+import { eq } from 'drizzle-orm'
+import { db } from '@/db'
+import { invitations } from '@/db/schema'
 import type { Invitation } from '@/types/invitation'
 
-const DATA_DIR = join(process.cwd(), 'data')
-const DATA_FILE = join(DATA_DIR, 'invitations.json')
-
-function ensureDataFile(): void {
-  if (!existsSync(DATA_DIR)) {
-    mkdirSync(DATA_DIR, { recursive: true })
+function rowToInvitation(row: typeof invitations.$inferSelect): Invitation {
+  return {
+    id: row.id,
+    slug: row.slug,
+    templateId: row.templateId,
+    brideName: row.brideName,
+    groomName: row.groomName,
+    weddingDate: row.weddingDate,
+    weddingTime: row.weddingTime,
+    venue: row.venue,
+    venueAddress: row.venueAddress ?? undefined,
+    photos: (row.photos as string[]) ?? [],
+    message: row.message ?? undefined,
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
   }
-  if (!existsSync(DATA_FILE)) {
-    writeFileSync(DATA_FILE, JSON.stringify([]), 'utf-8')
-  }
 }
 
-export function readInvitations(): Invitation[] {
-  ensureDataFile()
-  const raw = readFileSync(DATA_FILE, 'utf-8')
-  return JSON.parse(raw) as Invitation[]
+export async function readInvitations(): Promise<Invitation[]> {
+  const rows = await db.select().from(invitations)
+  return rows.map(rowToInvitation)
 }
 
-export function writeInvitations(invitations: Invitation[]): void {
-  ensureDataFile()
-  writeFileSync(DATA_FILE, JSON.stringify(invitations, null, 2), 'utf-8')
+export async function findBySlug(slug: string): Promise<Invitation | undefined> {
+  const rows = await db.select().from(invitations).where(eq(invitations.slug, slug))
+  return rows[0] ? rowToInvitation(rows[0]) : undefined
 }
 
-export function findBySlug(slug: string): Invitation | undefined {
-  return readInvitations().find((inv) => inv.slug === slug)
+export async function saveInvitation(invitation: Invitation): Promise<void> {
+  await db
+    .insert(invitations)
+    .values({
+      id: invitation.id,
+      slug: invitation.slug,
+      templateId: invitation.templateId,
+      brideName: invitation.brideName,
+      groomName: invitation.groomName,
+      weddingDate: invitation.weddingDate,
+      weddingTime: invitation.weddingTime,
+      venue: invitation.venue,
+      venueAddress: invitation.venueAddress ?? null,
+      photos: invitation.photos,
+      message: invitation.message ?? null,
+      createdAt: new Date(invitation.createdAt),
+      updatedAt: new Date(invitation.updatedAt),
+    })
+    .onConflictDoUpdate({
+      target: invitations.id,
+      set: {
+        slug: invitation.slug,
+        templateId: invitation.templateId,
+        brideName: invitation.brideName,
+        groomName: invitation.groomName,
+        weddingDate: invitation.weddingDate,
+        weddingTime: invitation.weddingTime,
+        venue: invitation.venue,
+        venueAddress: invitation.venueAddress ?? null,
+        photos: invitation.photos,
+        message: invitation.message ?? null,
+        updatedAt: new Date(invitation.updatedAt),
+      },
+    })
 }
 
-export function saveInvitation(invitation: Invitation): void {
-  const invitations = readInvitations()
-  const idx = invitations.findIndex((inv) => inv.id === invitation.id)
-  if (idx >= 0) {
-    invitations[idx] = invitation
-  } else {
-    invitations.push(invitation)
-  }
-  writeInvitations(invitations)
-}
-
-export function generateSlug(brideName: string, groomName: string): string {
-  const invitations = readInvitations()
+export async function generateSlug(brideName: string, groomName: string): Promise<string> {
   const slugify = (s: string) =>
     s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 
@@ -51,7 +77,9 @@ export function generateSlug(brideName: string, groomName: string): string {
   do {
     const suffix = Math.random().toString(36).slice(2, 6)
     slug = `${base}-${suffix}`
-  } while (invitations.some((inv) => inv.slug === slug))
+    const existing = await db.select({ id: invitations.id }).from(invitations).where(eq(invitations.slug, slug))
+    if (existing.length === 0) break
+  } while (true)
 
   return slug
 }

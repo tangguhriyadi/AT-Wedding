@@ -9,7 +9,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const invitation = findBySlug(slug)
+  const invitation = await findBySlug(slug)
 
   if (!invitation) {
     return { title: 'Undangan tidak ditemukan' }
@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function WeddingPage({ params }: Props) {
   const { slug } = await params
-  const invitation = findBySlug(slug)
+  const invitation = await findBySlug(slug)
 
   if (!invitation) {
     notFound()
