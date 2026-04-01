@@ -43,8 +43,8 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Amelia & Thomas | September 14, 2026",
-  description: "Join us for our wedding celebration",
+  title: "AT Wedding | Platform Undangan Digital Pernikahan",
+  description: "Buat undangan pernikahan digital yang indah dan bagikan kepada seluruh tamu dengan mudah. Pilih template elegan, modern, atau rustic.",
 };
 
 export default function RootLayout({
