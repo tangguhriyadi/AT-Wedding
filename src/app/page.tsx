@@ -1,721 +1,541 @@
-const C = {
-  font: "var(--font-cormorant)",
-  sans: "var(--font-geist-sans)",
-  gold: "var(--gold)",
-  goldLight: "var(--gold-light)",
-  ivory: "var(--ivory)",
-  parchment: "var(--parchment)",
-  dark: "var(--text-dark)",
-  mid: "var(--text-mid)",
-  light: "var(--text-light)",
-};
+import Link from 'next/link'
+import { TEMPLATES } from '@/components/templates'
 
-const schedule = [
-  {
-    time: "3:30 PM",
-    event: "Guest Arrival",
-    icon: "✿",
-    desc: "Welcome drinks and aperitivo served on the lakeside terrace",
-  },
-  {
-    time: "4:00 PM",
-    event: "Wedding Ceremony",
-    icon: "❦",
-    desc: "Exchange of vows at the breathtaking Villa del Balbianello",
-  },
-  {
-    time: "5:30 PM",
-    event: "Cocktail Hour",
-    icon: "❋",
-    desc: "Champagne, canapés, and lake views as the sun begins to set",
-  },
-  {
-    time: "7:00 PM",
-    event: "Dinner & Dancing",
-    icon: "❀",
-    desc: "Candlelit dinner and celebration at Grand Hotel Villa d'Este",
-  },
-];
+const templatePreviews: Record<string, { bg: string; accent: string; icon: string }> = {
+  elegant: { bg: 'linear-gradient(135deg, #F9F5EE 0%, #EFE8D8 100%)', accent: '#C4973C', icon: '❦' },
+  modern:  { bg: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',  accent: '#e94560', icon: '◆' },
+  rustic:  { bg: 'linear-gradient(135deg, #f5ebe0 0%, #ddb892 100%)',  accent: '#7a5c3a', icon: '✿' },
+}
 
-const galleryIcons = ["✿", "❦", "❋", "❀", "✾", "❁"];
+const steps = [
+  {
+    number: '01',
+    title: 'Pilih Template',
+    desc: 'Pilih dari koleksi template undangan kami yang cantik — Elegan, Modern, atau Rustic.',
+    icon: '🎨',
+  },
+  {
+    number: '02',
+    title: 'Isi Data',
+    desc: 'Masukkan nama pasangan, tanggal, lokasi, dan foto pernikahan Anda dengan mudah.',
+    icon: '✏️',
+  },
+  {
+    number: '03',
+    title: 'Bagikan',
+    desc: 'Dapatkan tautan unik dan bagikan undangan digital Anda kepada seluruh keluarga dan tamu.',
+    icon: '💌',
+  },
+]
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div style={{ background: C.ivory, color: C.dark }}>
+    <div className="min-h-screen" style={{ background: 'var(--ivory)', color: 'var(--text-dark)' }}>
 
-      {/* ════════════════════════════════════════
-          HERO
-      ════════════════════════════════════════ */}
-      <section
+      {/* ── NAV ──────────────────────────────────── */}
+      <nav
         style={{
-          position: "relative",
-          minHeight: "100svh",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "6rem 2rem",
-          overflow: "hidden",
+          position: 'sticky',
+          top: 0,
+          zIndex: 50,
+          background: 'rgba(249, 245, 238, 0.92)',
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid rgba(196, 151, 60, 0.15)',
+          padding: '1rem 2rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        {/* Watermark monogram */}
+        <span
+          style={{
+            fontFamily: 'var(--font-cormorant)',
+            fontSize: '1.6rem',
+            fontWeight: 600,
+            fontStyle: 'italic',
+            color: 'var(--text-dark)',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          AT <span style={{ color: 'var(--gold)' }}>Wedding</span>
+        </span>
+        <Link
+          href="/create"
+          style={{
+            background: 'var(--gold)',
+            color: '#fff',
+            padding: '0.55rem 1.4rem',
+            borderRadius: '2px',
+            fontFamily: 'var(--font-geist-sans)',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+          }}
+        >
+          Buat Undangan
+        </Link>
+      </nav>
+
+      {/* ── HERO ─────────────────────────────────── */}
+      <section
+        style={{
+          minHeight: '92svh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          padding: '6rem 1.5rem 4rem',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background monogram watermark */}
         <div
           aria-hidden
           style={{
-            position: "absolute",
+            position: 'absolute',
             inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            pointerEvents: "none",
-            userSelect: "none",
-            overflow: "hidden",
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
           }}
         >
           <span
             style={{
-              fontFamily: C.font,
-              fontSize: "clamp(220px, 45vw, 560px)",
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(200px, 40vw, 520px)',
               fontWeight: 300,
-              color: "rgba(196, 151, 60, 0.045)",
+              fontStyle: 'italic',
+              color: 'rgba(196, 151, 60, 0.04)',
               lineHeight: 1,
-              letterSpacing: "-0.05em",
-              fontStyle: "italic",
             }}
           >
-            AT
+            ♡
           </span>
         </div>
 
-        {/* Top botanical ornament */}
-        <div className="w-fade-in w-d1" style={{ marginBottom: "2.5rem", textAlign: "center" }}>
-          <span
-            className="w-botanical"
-            style={{ fontSize: "1.8rem", color: C.gold, display: "inline-block" }}
-          >
-            ❦
-          </span>
-        </div>
-
-        {/* Pre-text */}
+        {/* Label */}
         <p
-          className="w-label w-fade-in-up w-d2"
-          style={{ marginBottom: "2rem", textAlign: "center" }}
+          style={{
+            fontFamily: 'var(--font-geist-sans)',
+            fontSize: '0.7rem',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            color: 'var(--gold)',
+            marginBottom: '1.5rem',
+          }}
         >
-          Together with their families
+          Platform Undangan Digital Pernikahan
         </p>
 
-        {/* Names */}
-        <div className="w-fade-in-up w-d3" style={{ textAlign: "center" }}>
-          <h1
-            style={{
-              fontFamily: C.font,
-              fontSize: "clamp(4.5rem, 14vw, 11rem)",
-              fontWeight: 300,
-              fontStyle: "italic",
-              lineHeight: 0.88,
-              letterSpacing: "-0.02em",
-              color: C.dark,
-              margin: 0,
-            }}
-          >
-            Amelia
-          </h1>
-
-          {/* Ampersand row */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "1.25rem",
-              justifyContent: "center",
-              margin: "1.5rem 0",
-            }}
-          >
-            <div
-              style={{
-                height: "1px",
-                width: "clamp(40px, 8vw, 100px)",
-                background: `linear-gradient(90deg, transparent, ${C.gold})`,
-              }}
-            />
-            <span
-              className="gold-text"
-              style={{
-                fontFamily: C.font,
-                fontSize: "clamp(2.2rem, 6vw, 5rem)",
-                fontWeight: 300,
-                lineHeight: 1,
-              }}
-            >
-              &amp;
-            </span>
-            <div
-              style={{
-                height: "1px",
-                width: "clamp(40px, 8vw, 100px)",
-                background: `linear-gradient(90deg, ${C.gold}, transparent)`,
-              }}
-            />
-          </div>
-
-          <h1
-            style={{
-              fontFamily: C.font,
-              fontSize: "clamp(4.5rem, 14vw, 11rem)",
-              fontWeight: 300,
-              fontStyle: "italic",
-              lineHeight: 0.88,
-              letterSpacing: "-0.02em",
-              color: C.dark,
-              margin: 0,
-            }}
-          >
-            Thomas
-          </h1>
-        </div>
-
-        {/* Ornamental divider */}
-        <div className="w-fade-in-up w-d4" style={{ width: "min(200px, 50vw)", margin: "2.5rem auto 0" }}>
-          <div className="w-ornament" style={{ justifyContent: "center" }}>
-            <span style={{ fontSize: "0.6rem" }}>✦</span>
-          </div>
-        </div>
-
-        {/* Date & location */}
-        <div className="w-fade-in-up w-d5" style={{ textAlign: "center", marginTop: "2rem" }}>
-          <p
-            style={{
-              fontFamily: C.font,
-              fontSize: "clamp(1.2rem, 3.5vw, 2rem)",
-              fontWeight: 400,
-              letterSpacing: "0.12em",
-              color: C.mid,
-              margin: "0 0 0.6rem",
-            }}
-          >
-            Saturday, September 14, 2026
-          </p>
-          <p
-            className="w-label"
-            style={{ color: C.gold, letterSpacing: "0.3em" }}
-          >
-            Villa del Balbianello · Lake Como, Italy
-          </p>
-        </div>
-
-        {/* Scroll indicator */}
-        <div
-          className="w-fade-in w-d7"
+        {/* Headline */}
+        <h1
           style={{
-            position: "absolute",
-            bottom: "2rem",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.5rem",
+            fontFamily: 'var(--font-cormorant)',
+            fontSize: 'clamp(3rem, 8vw, 6.5rem)',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            lineHeight: 1.05,
+            letterSpacing: '-0.02em',
+            color: 'var(--text-dark)',
+            maxWidth: '900px',
+            margin: '0 auto 1.5rem',
           }}
         >
-          <span
-            className="w-label"
-            style={{ color: C.light, fontSize: "0.6rem" }}
-          >
-            Scroll
-          </span>
-          <div className="w-scroll-line" />
-        </div>
+          Buat Undangan Pernikahan
+          <br />
+          <span style={{ color: 'var(--gold)' }}>Digital yang Indah</span>
+        </h1>
+
+        {/* Subheadline */}
+        <p
+          style={{
+            fontFamily: 'var(--font-cormorant)',
+            fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)',
+            color: 'var(--text-mid)',
+            maxWidth: '580px',
+            lineHeight: 1.7,
+            margin: '0 auto 3rem',
+          }}
+        >
+          Pilih template cantik, isi data pasangan Anda, dan bagikan tautan undangan unik kepada semua tamu dalam hitungan menit.
+        </p>
+
+        {/* CTA */}
+        <Link
+          href="/create"
+          style={{
+            display: 'inline-block',
+            background: 'var(--gold)',
+            color: '#fff',
+            padding: '1rem 2.5rem',
+            borderRadius: '2px',
+            fontFamily: 'var(--font-geist-sans)',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
+            boxShadow: '0 4px 20px rgba(196, 151, 60, 0.35)',
+          }}
+        >
+          Buat Undangan Sekarang →
+        </Link>
+
+        <p
+          style={{
+            marginTop: '1rem',
+            fontFamily: 'var(--font-geist-sans)',
+            fontSize: '0.75rem',
+            color: 'var(--text-light)',
+            letterSpacing: '0.1em',
+          }}
+        >
+          GRATIS · CEPAT · MUDAH
+        </p>
       </section>
 
-      {/* ════════════════════════════════════════
-          DETAILS
-      ════════════════════════════════════════ */}
-      <section style={{ padding: "7rem 2rem", background: C.parchment }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          {/* Heading */}
-          <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-            <span className="w-label" style={{ marginBottom: "1rem" }}>The Celebration</span>
+      {/* ── TEMPLATE GALLERY ─────────────────────── */}
+      <section style={{ padding: '6rem 1.5rem', background: 'var(--parchment)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          {/* Section heading */}
+          <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-geist-sans)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase',
+                color: 'var(--gold)',
+                marginBottom: '0.75rem',
+              }}
+            >
+              Koleksi Template
+            </p>
             <h2
               style={{
-                fontFamily: C.font,
-                fontSize: "clamp(2.8rem, 7vw, 5rem)",
+                fontFamily: 'var(--font-cormorant)',
+                fontSize: 'clamp(2.2rem, 5vw, 4rem)',
                 fontWeight: 300,
-                fontStyle: "italic",
-                color: C.dark,
+                fontStyle: 'italic',
+                color: 'var(--text-dark)',
                 margin: 0,
               }}
             >
-              Join Us
+              Pilih Gaya Undangan Anda
             </h2>
           </div>
 
-          {/* Cards */}
+          {/* Cards grid */}
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-              gap: "1.5rem",
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '1.5rem',
             }}
           >
-            {/* Ceremony */}
-            <div
-              className="w-card"
-              style={{
-                borderRadius: "2px",
-                padding: "clamp(2rem, 5vw, 3.5rem)",
-                textAlign: "center",
-              }}
-            >
-              <span
-                className="w-botanical"
-                style={{
-                  display: "block",
-                  color: C.gold,
-                  fontSize: "2rem",
-                  marginBottom: "1.25rem",
-                }}
-              >
-                ❁
-              </span>
-              <span className="w-label" style={{ marginBottom: "0.75rem" }}>Ceremony</span>
-              <h3
-                style={{
-                  fontFamily: C.font,
-                  fontSize: "1.9rem",
-                  fontWeight: 400,
-                  fontStyle: "italic",
-                  color: C.dark,
-                  margin: "0.5rem 0 1.25rem",
-                }}
-              >
-                Villa del Balbianello
-              </h3>
-              <p
-                style={{
-                  color: C.mid,
-                  lineHeight: 1.9,
-                  fontFamily: C.font,
-                  fontSize: "1.05rem",
-                }}
-              >
-                Via Comoedia 5<br />
-                Lenno, Lake Como<br />
-                22016 CO, Italy
-              </p>
-              <div
-                style={{
-                  width: "36px",
-                  height: "1px",
-                  background: C.gold,
-                  margin: "1.75rem auto",
-                }}
-              />
-              <p
-                style={{
-                  fontFamily: C.font,
-                  fontSize: "1.5rem",
-                  color: C.dark,
-                  fontStyle: "italic",
-                }}
-              >
-                4:00 <span style={{ fontSize: "1rem" }}>PM</span>
-              </p>
-            </div>
-
-            {/* Reception */}
-            <div
-              className="w-card"
-              style={{
-                borderRadius: "2px",
-                padding: "clamp(2rem, 5vw, 3.5rem)",
-                textAlign: "center",
-              }}
-            >
-              <span
-                className="w-botanical-2"
-                style={{
-                  display: "block",
-                  color: C.gold,
-                  fontSize: "2rem",
-                  marginBottom: "1.25rem",
-                }}
-              >
-                ❋
-              </span>
-              <span className="w-label" style={{ marginBottom: "0.75rem" }}>Reception</span>
-              <h3
-                style={{
-                  fontFamily: C.font,
-                  fontSize: "1.9rem",
-                  fontWeight: 400,
-                  fontStyle: "italic",
-                  color: C.dark,
-                  margin: "0.5rem 0 1.25rem",
-                }}
-              >
-                Grand Hotel Villa d&#8217;Este
-              </h3>
-              <p
-                style={{
-                  color: C.mid,
-                  lineHeight: 1.9,
-                  fontFamily: C.font,
-                  fontSize: "1.05rem",
-                }}
-              >
-                Via Regina 40<br />
-                Cernobbio, Lake Como<br />
-                22012 CO, Italy
-              </p>
-              <div
-                style={{
-                  width: "36px",
-                  height: "1px",
-                  background: C.gold,
-                  margin: "1.75rem auto",
-                }}
-              />
-              <p
-                style={{
-                  fontFamily: C.font,
-                  fontSize: "1.5rem",
-                  color: C.dark,
-                  fontStyle: "italic",
-                }}
-              >
-                7:00 <span style={{ fontSize: "1rem" }}>PM</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════
-          SCHEDULE
-      ════════════════════════════════════════ */}
-      <section style={{ padding: "7rem 2rem", background: C.ivory }}>
-        <div style={{ maxWidth: "720px", margin: "0 auto" }}>
-          {/* Heading */}
-          <div style={{ textAlign: "center", marginBottom: "4.5rem" }}>
-            <span className="w-label" style={{ marginBottom: "1rem" }}>The Day Unfolds</span>
-            <h2
-              style={{
-                fontFamily: C.font,
-                fontSize: "clamp(2.8rem, 7vw, 5rem)",
-                fontWeight: 300,
-                fontStyle: "italic",
-                color: C.dark,
-                margin: 0,
-              }}
-            >
-              Schedule
-            </h2>
-          </div>
-
-          {/* Timeline */}
-          <div style={{ position: "relative" }}>
-            {/* Vertical line */}
-            <div
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: "50%",
-                top: 0,
-                bottom: 0,
-                width: "1px",
-                background: `linear-gradient(to bottom, transparent, ${C.gold} 15%, ${C.gold} 85%, transparent)`,
-                transform: "translateX(-50%)",
-              }}
-            />
-
-            {schedule.map((item, i) => {
-              const isRight = i % 2 === 0;
+            {TEMPLATES.map((tpl) => {
+              const preview = templatePreviews[tpl.id] ?? templatePreviews.elegant
               return (
                 <div
-                  key={i}
+                  key={tpl.id}
                   style={{
-                    position: "relative",
-                    display: "grid",
-                    gridTemplateColumns: "1fr 56px 1fr",
-                    alignItems: "center",
-                    marginBottom: i < schedule.length - 1 ? "3.5rem" : 0,
-                    gap: "1.5rem",
+                    borderRadius: '4px',
+                    overflow: 'hidden',
+                    background: '#fff',
+                    boxShadow: '0 2px 24px rgba(42, 33, 24, 0.08)',
                   }}
                 >
-                  {/* Left slot */}
-                  <div style={{ textAlign: "right" }}>
-                    {isRight && (
-                      <>
-                        <span
-                          className="w-label"
-                          style={{ marginBottom: "0.35rem", display: "block" }}
-                        >
-                          {item.time}
-                        </span>
-                        <h3
-                          style={{
-                            fontFamily: C.font,
-                            fontSize: "1.45rem",
-                            fontWeight: 500,
-                            color: C.dark,
-                            margin: "0 0 0.3rem",
-                          }}
-                        >
-                          {item.event}
-                        </h3>
-                        <p
-                          style={{
-                            color: C.light,
-                            fontSize: "0.9rem",
-                            lineHeight: 1.65,
-                            margin: 0,
-                            fontFamily: C.font,
-                          }}
-                        >
-                          {item.desc}
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Center dot */}
-                  <div className="w-timeline-dot">{item.icon}</div>
-
-                  {/* Right slot */}
-                  <div style={{ textAlign: "left" }}>
-                    {!isRight && (
-                      <>
-                        <span
-                          className="w-label"
-                          style={{ marginBottom: "0.35rem", display: "block" }}
-                        >
-                          {item.time}
-                        </span>
-                        <h3
-                          style={{
-                            fontFamily: C.font,
-                            fontSize: "1.45rem",
-                            fontWeight: 500,
-                            color: C.dark,
-                            margin: "0 0 0.3rem",
-                          }}
-                        >
-                          {item.event}
-                        </h3>
-                        <p
-                          style={{
-                            color: C.light,
-                            fontSize: "0.9rem",
-                            lineHeight: 1.65,
-                            margin: 0,
-                            fontFamily: C.font,
-                          }}
-                        >
-                          {item.desc}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════
-          GALLERY
-      ════════════════════════════════════════ */}
-      <section style={{ padding: "7rem 2rem", background: C.parchment }}>
-        <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-          {/* Heading */}
-          <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
-            <span className="w-label" style={{ marginBottom: "1rem" }}>Our Story</span>
-            <h2
-              style={{
-                fontFamily: C.font,
-                fontSize: "clamp(2.8rem, 7vw, 5rem)",
-                fontWeight: 300,
-                fontStyle: "italic",
-                color: C.dark,
-                margin: 0,
-              }}
-            >
-              Moments
-            </h2>
-          </div>
-
-          {/* Gallery grid */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gridTemplateRows: "auto auto",
-              gap: "0.75rem",
-            }}
-          >
-            {galleryIcons.map((icon, i) => {
-              const hues = [32, 20, 40, 28, 36, 25];
-              const lights = [83, 78, 85, 80, 82, 77];
-              const tall = i === 1 || i === 4;
-              return (
-                <div
-                  key={i}
-                  className="w-gallery-cell"
-                  style={{
-                    aspectRatio: tall ? "3 / 4" : "4 / 3",
-                    background: `linear-gradient(135deg, hsl(${hues[i]}, 28%, ${lights[i]}%), hsl(${hues[i] + 10}, 32%, ${lights[i] - 4}%))`,
-                    gridRow: tall ? "span 1" : undefined,
-                  }}
-                >
-                  <span
+                  {/* Preview thumbnail */}
+                  <div
                     style={{
-                      color: "rgba(196, 151, 60, 0.25)",
-                      fontSize: "clamp(1.5rem, 4vw, 2.5rem)",
-                      position: "relative",
-                      zIndex: 1,
+                      height: '200px',
+                      background: preview.bg,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'relative',
                     }}
                   >
-                    {icon}
-                  </span>
+                    <span
+                      style={{
+                        fontSize: '4rem',
+                        color: preview.accent,
+                        opacity: 0.6,
+                      }}
+                    >
+                      {preview.icon}
+                    </span>
+                    <div
+                      style={{
+                        position: 'absolute',
+                        inset: 0,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                        padding: '1.25rem',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: 'var(--font-cormorant)',
+                          fontSize: '1.1rem',
+                          fontStyle: 'italic',
+                          color: preview.accent,
+                          opacity: 0.8,
+                        }}
+                      >
+                        Nama & Nama
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card body */}
+                  <div style={{ padding: '1.5rem' }}>
+                    <h3
+                      style={{
+                        fontFamily: 'var(--font-cormorant)',
+                        fontSize: '1.5rem',
+                        fontWeight: 500,
+                        color: 'var(--text-dark)',
+                        margin: '0 0 0.5rem',
+                      }}
+                    >
+                      {tpl.name}
+                    </h3>
+                    <p
+                      style={{
+                        fontFamily: 'var(--font-geist-sans)',
+                        fontSize: '0.85rem',
+                        color: 'var(--text-mid)',
+                        lineHeight: 1.6,
+                        margin: '0 0 1.25rem',
+                      }}
+                    >
+                      {tpl.description}
+                    </p>
+                    <Link
+                      href="/create"
+                      style={{
+                        display: 'inline-block',
+                        border: `1px solid ${preview.accent}`,
+                        color: preview.accent,
+                        padding: '0.5rem 1.25rem',
+                        borderRadius: '2px',
+                        fontFamily: 'var(--font-geist-sans)',
+                        fontSize: '0.75rem',
+                        fontWeight: 600,
+                        letterSpacing: '0.1em',
+                        textTransform: 'uppercase',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Gunakan Template
+                    </Link>
+                  </div>
                 </div>
-              );
+              )
             })}
           </div>
-
-          <p
-            style={{
-              textAlign: "center",
-              marginTop: "2rem",
-              fontFamily: C.font,
-              fontStyle: "italic",
-              color: C.light,
-              fontSize: "1.1rem",
-            }}
-          >
-            Photos coming soon &mdash; we cannot wait to share them with you
-          </p>
         </div>
       </section>
 
-      {/* ════════════════════════════════════════
-          RSVP
-      ════════════════════════════════════════ */}
+      {/* ── HOW IT WORKS ─────────────────────────── */}
+      <section style={{ padding: '6rem 1.5rem', background: 'var(--ivory)' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          {/* Section heading */}
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+            <p
+              style={{
+                fontFamily: 'var(--font-geist-sans)',
+                fontSize: '0.7rem',
+                letterSpacing: '0.3em',
+                textTransform: 'uppercase',
+                color: 'var(--gold)',
+                marginBottom: '0.75rem',
+              }}
+            >
+              Cara Kerja
+            </p>
+            <h2
+              style={{
+                fontFamily: 'var(--font-cormorant)',
+                fontSize: 'clamp(2.2rem, 5vw, 4rem)',
+                fontWeight: 300,
+                fontStyle: 'italic',
+                color: 'var(--text-dark)',
+                margin: 0,
+              }}
+            >
+              Tiga Langkah Mudah
+            </h2>
+          </div>
+
+          {/* Steps */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+              gap: '2rem',
+            }}
+          >
+            {steps.map((step) => (
+              <div
+                key={step.number}
+                style={{
+                  textAlign: 'center',
+                  padding: '2rem 1.5rem',
+                  background: 'var(--parchment)',
+                  borderRadius: '4px',
+                  position: 'relative',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'block',
+                    fontFamily: 'var(--font-geist-sans)',
+                    fontSize: '0.65rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.2em',
+                    color: 'var(--gold)',
+                    marginBottom: '1rem',
+                  }}
+                >
+                  {step.number}
+                </span>
+                <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '1rem' }}>
+                  {step.icon}
+                </span>
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-cormorant)',
+                    fontSize: '1.5rem',
+                    fontWeight: 500,
+                    color: 'var(--text-dark)',
+                    margin: '0 0 0.75rem',
+                  }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  style={{
+                    fontFamily: 'var(--font-geist-sans)',
+                    fontSize: '0.875rem',
+                    color: 'var(--text-mid)',
+                    lineHeight: 1.65,
+                    margin: 0,
+                  }}
+                >
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA SECTION ──────────────────────────── */}
       <section
         style={{
-          padding: "8rem 2rem",
-          background: `linear-gradient(160deg, ${C.dark} 0%, #3D2E1E 100%)`,
-          color: C.ivory,
+          padding: '8rem 1.5rem',
+          background: 'linear-gradient(160deg, var(--text-dark) 0%, #3D2E1E 100%)',
+          textAlign: 'center',
         }}
       >
-        <div style={{ maxWidth: "560px", margin: "0 auto", textAlign: "center" }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto' }}>
           <span
-            className="w-botanical"
             style={{
-              display: "block",
-              color: C.gold,
-              fontSize: "2rem",
-              marginBottom: "1.5rem",
+              display: 'block',
+              fontSize: '2.5rem',
+              marginBottom: '1.5rem',
+              color: 'var(--gold)',
             }}
           >
             ❦
           </span>
-
-          <span
-            className="w-label"
-            style={{ marginBottom: "1rem", color: C.gold }}
-          >
-            Kindly Reply By
-          </span>
-
           <h2
             style={{
-              fontFamily: C.font,
-              fontSize: "clamp(2.8rem, 7vw, 5rem)",
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: 'clamp(2.2rem, 5vw, 4rem)',
               fontWeight: 300,
-              fontStyle: "italic",
-              color: C.ivory,
-              margin: "0.25rem 0",
+              fontStyle: 'italic',
+              color: 'var(--ivory)',
+              margin: '0 0 1.25rem',
             }}
           >
-            August 1, 2026
+            Siap Membuat Undangan?
           </h2>
-
-          <div
-            style={{
-              width: "60px",
-              height: "1px",
-              background: C.gold,
-              margin: "2.5rem auto",
-              opacity: 0.6,
-            }}
-          />
-
           <p
             style={{
-              fontFamily: C.font,
-              fontSize: "1.25rem",
-              color: "rgba(249, 245, 238, 0.65)",
-              lineHeight: 1.85,
-              marginBottom: "3rem",
+              fontFamily: 'var(--font-cormorant)',
+              fontSize: '1.25rem',
+              color: 'rgba(249, 245, 238, 0.65)',
+              lineHeight: 1.7,
+              marginBottom: '2.5rem',
             }}
           >
-            We would be truly honored by your presence as we begin our new
-            chapter together. Please let us know if you are able to join us in
-            celebrating this joyous occasion.
+            Bergabunglah dengan ribuan pasangan yang telah mempercayakan undangan digital pernikahan mereka kepada AT Wedding.
           </p>
-
-          <a
-            href="mailto:rsvp@ameliaandthomas.com?subject=RSVP%20%E2%80%94%20Amelia%20%26%20Thomas%20Wedding"
-            className="w-rsvp-btn"
-          >
-            RSVP Now
-          </a>
-
-          <p
+          <Link
+            href="/create"
             style={{
-              fontFamily: C.sans,
-              fontSize: "0.62rem",
-              letterSpacing: "0.22em",
-              textTransform: "uppercase",
-              color: "rgba(249, 245, 238, 0.3)",
-              marginTop: "2rem",
+              display: 'inline-block',
+              background: 'var(--gold)',
+              color: '#fff',
+              padding: '1.1rem 3rem',
+              borderRadius: '2px',
+              fontFamily: 'var(--font-geist-sans)',
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              boxShadow: '0 4px 24px rgba(196, 151, 60, 0.4)',
             }}
           >
-            rsvp@ameliaandthomas.com
-          </p>
+            Mulai Buat Undangan Gratis →
+          </Link>
         </div>
       </section>
 
-      {/* ════════════════════════════════════════
-          FOOTER
-      ════════════════════════════════════════ */}
+      {/* ── FOOTER ───────────────────────────────── */}
       <footer
         style={{
-          background: C.dark,
-          borderTop: "1px solid rgba(196, 151, 60, 0.15)",
-          padding: "2.5rem 2rem",
-          textAlign: "center",
+          background: 'var(--text-dark)',
+          borderTop: '1px solid rgba(196, 151, 60, 0.12)',
+          padding: '2.5rem 1.5rem',
+          textAlign: 'center',
         }}
       >
-        <div
-          className="w-ornament"
-          style={{ maxWidth: "300px", margin: "0 auto 1.25rem" }}
-        >
-          <span style={{ fontSize: "0.7rem" }}>✦</span>
-        </div>
         <p
           style={{
-            fontFamily: C.font,
-            fontStyle: "italic",
-            fontSize: "1.1rem",
-            color: "rgba(249, 245, 238, 0.35)",
+            fontFamily: 'var(--font-cormorant)',
+            fontStyle: 'italic',
+            fontSize: '1.1rem',
+            color: 'rgba(249, 245, 238, 0.35)',
+            margin: '0 0 0.5rem',
+          }}
+        >
+          AT Wedding
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-geist-sans)',
+            fontSize: '0.7rem',
+            color: 'rgba(249, 245, 238, 0.2)',
+            letterSpacing: '0.12em',
             margin: 0,
           }}
         >
-          Amelia &amp; Thomas &middot; September 14, 2026
+          © {new Date().getFullYear()} AT Wedding · Platform Undangan Digital Pernikahan
         </p>
       </footer>
 
     </div>
-  );
+  )
 }
